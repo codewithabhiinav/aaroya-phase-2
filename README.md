@@ -148,6 +148,51 @@ To use Supabase instead of local storage:
 - Production deployment requires: authentication, authorization, encryption, audit logging
 - Never commit API keys or service-role credentials to version control
 
+## Testing QR Codes
+
+### 🧪 Quick Test Method
+
+1. **Create a case**: Dashboard → "New Case" or "🎤 Try Voice Demo"
+2. **Fill information**: Enter patient details (or use voice input)
+3. **Generate AI note**: Click "Generate Structured Note" on the Scribe page
+4. **Verify**: Click "Continue to Verification" → "Verify and Save Record"
+5. **Generate QR**: Click "Generate QR Code"
+6. **Test the QR**: 
+   - Click "🔗 Test QR Link → Opens Record" button (green banner at top)
+   - OR go to Dashboard → "🧪 Test QR Codes" button
+   - OR manually copy the URL and open in a new tab
+
+### 📱 Important: How QR Codes Work in Demo Mode
+
+**Same Device/Browser**: ✅ Works perfectly
+- QR links open the doctor record page
+- All case data is displayed correctly
+- PDF export and print functions work
+
+**Different Device**: ❌ Won't work (expected for demo)
+- Demo data is stored in browser `localStorage`
+- Each device has its own localStorage
+- Scanning QR from phone won't find the case data
+
+**Why?** This is a frontend-only demo using localStorage. In production with Supabase backend, QR codes would work on any device.
+
+### 🔍 Debug Information
+
+If you see "Record Not Found":
+1. Check the debug panel showing available tokens
+2. Verify you're on the same device/browser where the case was created
+3. Use the "Test QR Codes" page to see all available case links
+4. Try clicking "Open Record" directly from the test page
+
+### 🎯 Test Page Features
+
+Visit `/test-qr` to:
+- See all verified cases with their QR tokens
+- Copy QR links to clipboard
+- Open records in new tabs
+- View all case statuses
+- Debug token mismatches
+
 ## Testing
 
 ### End-to-End Workflows

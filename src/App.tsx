@@ -11,6 +11,7 @@ import DoctorRecord from './pages/DoctorRecord';
 import History from './pages/History';
 import Roadmap from './pages/Roadmap';
 import Settings from './pages/Settings';
+import TestQRCodes from './pages/TestQRCodes';
 
 function App() {
   useEffect(() => {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/history" element={<History />} />
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/test-qr" element={<TestQRCodes />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

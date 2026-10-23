@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Heart, Copy, Download, Printer, AlertTriangle, Shield, CheckCircle, Clock } from 'lucide-react';
-import { getCaseByToken } from '../store';
+import { getCaseByToken, getAllCases } from '../store';
 import { EmergencyCase } from '../types';
 import jsPDF from 'jspdf';
 
@@ -10,16 +10,28 @@ export default function DoctorRecord() {
   const [caseData, setCaseData] = useState<EmergencyCase | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
+    console.log('DoctorRecord: Looking for token:', token);
     if (token) {
       const c = getCaseByToken(token);
+      console.log('DoctorRecord: Found case:', c);
+      
       if (c) {
         setCaseData(c);
+        setDebugInfo(`✓ Found case with token: ${token}`);
       } else {
+        // Debug: show all available tokens
+        const allCases = getAllCases();
+        const availableTokens = allCases.map(c => c.publicToken);
+        console.log('DoctorRecord: Available tokens:', availableTokens);
+        setDebugInfo(`Token "${token}" not found. Available tokens: ${availableTokens.join(', ') || 'none'}`);
         setNotFound(true);
       }
     } else {
+      console.log('DoctorRecord: No token provided');
+      setDebugInfo('No token provided in URL');
       setNotFound(true);
     }
   }, [token]);
@@ -190,21 +202,51 @@ export default function DoctorRecord() {
 
   // Not found state
   if (notFound) {
+    const allCases = getAllCases();
     return (
       <div className="min-h-screen bg-[#FCFBF8] flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
+        <div className="text-center max-w-2xl w-full">
           <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
             <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
           <h1 className="text-xl font-bold text-[#0B2342] mb-2">Record Not Found</h1>
-          <p className="text-sm text-gray-500 mb-6">
-            This QR code link is invalid, expired, or the record has been deleted. 
-            No patient information is available at this link.
+          <p className="text-sm text-gray-500 mb-4">
+            This QR code link is invalid, expired, or the record has been deleted.
           </p>
-          <div className="p-4 bg-gray-50 rounded-lg text-xs text-gray-400">
-            <Shield className="w-4 h-4 inline mr-1" />
-            For security, no information about other records is disclosed.
+          
+          {/* Debug Info */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left">
+            <p className="text-xs font-semibold text-yellow-800 mb-2">🔍 Debug Information:</p>
+            <p className="text-xs text-yellow-700 mb-2">{debugInfo}</p>
+            {allCases.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-yellow-200">
+                <p className="text-xs font-semibold text-yellow-800 mb-2">Available Cases ({allCases.length}):</p>
+                <div className="space-y-1 max-h-40 overflow-y-auto">
+                  {allCases.map(c => (
+                    <div key={c.id} className="text-xs text-yellow-700 flex justify-between items-center bg-yellow-100/50 px-2 py-1 rounded">
+                      <span className="font-mono">{c.publicToken}</span>
+                      <span className="text-yellow-600">{c.patientLabel?.substring(0, 20) || 'Anonymous'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {allCases.length === 0 && (
+              <p className="text-xs text-yellow-700 mt-2">No cases found in localStorage. Create a case first!</p>
+            )}
           </div>
+
+          <div className="p-4 bg-gray-50 rounded-lg text-xs text-gray-400 mb-4">
+            <Shield className="w-4 h-4 inline mr-1" />
+            <strong>Why this happens:</strong> Demo data is stored in browser localStorage. 
+            QR codes only work on the same device/browser where the case was created.
+            <br /><br />
+            <strong>Solution:</strong> Go back to the QR page and click "Open Record in New Tab" to test the link in the same browser.
+          </div>
+
+          <a href="/dashboard" className="inline-block px-6 py-2 bg-[#12365B] text-white rounded-lg text-sm font-medium hover:bg-[#0B2342]">
+            Go to Dashboard
+          </a>
         </div>
       </div>
     );

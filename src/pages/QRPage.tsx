@@ -168,6 +168,33 @@ export default function QRPage() {
           </div>
         )}
 
+        {/* Quick Test Banner */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-green-900 mb-1">✅ QR Code Ready to Test!</h3>
+              <p className="text-sm text-green-800 mb-3">
+                Click the button below to open the doctor record in a new tab and verify it works.
+              </p>
+              <a
+                href={recordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors shadow-lg shadow-green-200"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Test QR Link → Opens Record
+              </a>
+              <p className="text-xs text-green-700 mt-2">
+                URL: <code className="bg-green-100 px-2 py-0.5 rounded text-xs">{recordUrl}</code>
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* QR Code */}
           <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
@@ -249,12 +276,32 @@ export default function QRPage() {
               </div>
             </div>
 
+            {/* Test Link */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-green-800 mb-2">🧪 Test This QR Link</h3>
+              <p className="text-xs text-green-700 mb-3">
+                Click below to open the doctor record in a new tab (same browser). 
+                This proves the QR link works correctly.
+              </p>
+              <a
+                href={recordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium text-center hover:bg-green-700 transition-colors"
+              >
+                🔗 Open Record in New Tab
+              </a>
+            </div>
+
             <div className="bg-[#12365B] rounded-xl p-6 text-white">
-              <h3 className="font-semibold mb-2">Deployment Note</h3>
-              <p className="text-sm text-gray-300">
-                This QR link uses the current deployment URL ({getBaseUrl()}). When deployed to a public domain, 
-                the QR code will be scannable from any device with network access. 
-                In demo mode, links point to this browser session's storage.
+              <h3 className="font-semibold mb-2">📱 How QR Works</h3>
+              <div className="text-sm text-gray-300 space-y-2">
+                <p><strong>Same device:</strong> Click "Open Record in New Tab" above to test.</p>
+                <p><strong>Different device:</strong> Scan QR with phone camera. Note: demo data is stored in browser localStorage, so it only works on THIS device/browser.</p>
+                <p><strong>Production:</strong> With Supabase backend, QR would work on any device.</p>
+              </div>
+              <p className="text-xs text-gray-400 mt-3">
+                Current URL: {getBaseUrl()}
               </p>
             </div>
 

@@ -99,6 +99,9 @@ export default function Dashboard() {
             <button onClick={handleTryVoiceDemo} className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2 shadow-lg shadow-red-200">
               <Mic className="w-4 h-4" /> 🎤 Try Voice Demo
             </button>
+            <Link to="/test-qr" className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2 shadow-lg shadow-blue-200">
+              <QrCode className="w-4 h-4" /> 🧪 Test QR Codes
+            </Link>
             <button onClick={handleLoadDemo} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
               Load Demo Cases
             </button>
