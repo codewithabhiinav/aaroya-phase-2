@@ -18,11 +18,40 @@ export function getCaseById(id: string): EmergencyCase | null {
 }
 
 export function getCaseByToken(token: string): EmergencyCase | null {
+  console.log('=== getCaseByToken called ===');
+  console.log('Looking for token:', token);
+  console.log('Token length:', token?.length);
+  console.log('Token type:', typeof token);
+  
   const cases = getAllCases();
-  console.log('Searching for token:', token);
-  console.log('Available tokens:', cases.map(c => c.publicToken));
-  const found = cases.find(c => c.publicToken === token) || null;
-  console.log('Found case:', found);
+  console.log('Total cases in storage:', cases.length);
+  
+  const allTokens = cases.map(c => ({
+    token: c.publicToken,
+    length: c.publicToken.length,
+    patient: c.patientLabel
+  }));
+  console.log('All available tokens:', allTokens);
+  
+  // Try exact match first
+  let found = cases.find(c => c.publicToken === token) || null;
+  console.log('Exact match result:', found ? 'FOUND' : 'NOT FOUND');
+  
+  // If not found, try case-insensitive match
+  if (!found && token) {
+    found = cases.find(c => c.publicToken.toLowerCase() === token.toLowerCase()) || null;
+    console.log('Case-insensitive match result:', found ? 'FOUND' : 'NOT FOUND');
+  }
+  
+  // If still not found, try partial match (first 16 chars)
+  if (!found && token) {
+    found = cases.find(c => c.publicToken.substring(0, 16) === token.substring(0, 16)) || null;
+    console.log('Partial match result:', found ? 'FOUND' : 'NOT FOUND');
+  }
+  
+  console.log('Final result:', found ? `Found case: ${found.patientLabel}` : 'No case found');
+  console.log('=== End getCaseByToken ===');
+  
   return found;
 }
 

@@ -8,10 +8,17 @@ import { EmergencyCase } from '../types';
 export default function TestQRCodes() {
   const [cases, setCases] = useState<EmergencyCase[]>([]);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
+  const [manualToken, setManualToken] = useState('');
 
   useEffect(() => {
     setCases(getAllCases());
   }, []);
+
+  function handleManualTest() {
+    if (manualToken.trim()) {
+      window.open(`/record/${manualToken.trim()}`, '_blank');
+    }
+  }
 
   function copyLink(token: string) {
     const url = `${window.location.origin}/record/${token}`;
@@ -44,6 +51,32 @@ export default function TestQRCodes() {
             <li>The doctor record page should load with case details</li>
             <li>Copy the link to test on mobile (same device/browser only for demo)</li>
           </ol>
+        </div>
+
+        {/* Manual Token Test */}
+        <div className="bg-white border-2 border-purple-300 rounded-xl p-6 mb-6 shadow-md">
+          <h3 className="text-lg font-bold text-[#0B2342] mb-3 flex items-center gap-2">
+            <span>🔧</span> Manual Token Test
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Paste a token below to test if it exists and opens correctly:
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={manualToken}
+              onChange={(e) => setManualToken(e.target.value)}
+              placeholder="Paste token here (e.g., abc123def456...)"
+              className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-mono focus:border-purple-500 focus:outline-none"
+            />
+            <button
+              onClick={handleManualTest}
+              disabled={!manualToken.trim()}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              Test →
+            </button>
+          </div>
         </div>
 
         {verifiedCases.length > 0 ? (

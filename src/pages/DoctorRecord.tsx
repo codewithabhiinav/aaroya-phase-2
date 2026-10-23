@@ -14,24 +14,41 @@ export default function DoctorRecord() {
 
   useEffect(() => {
     console.log('=== DoctorRecord Loading ===');
-    console.log('Token from URL:', token);
+    console.log('Token from URL params:', token);
+    console.log('Token type:', typeof token);
+    console.log('Token length:', token?.length);
+    console.log('Current URL:', window.location.href);
     
     if (token) {
-      // Small delay to ensure localStorage is ready
-      setTimeout(() => {
-        const c = getCaseByToken(token);
-        console.log('Case found:', c);
-        
-        if (c) {
-          setCaseData(c);
-          setNotFound(false);
-        } else {
-          setNotFound(true);
-        }
+      // Try immediately first
+      const c = getCaseByToken(token);
+      console.log('Immediate lookup result:', c);
+      
+      if (c) {
+        console.log('✅ Case found immediately');
+        setCaseData(c);
+        setNotFound(false);
         setLoading(false);
-      }, 100);
+      } else {
+        // If not found, wait a bit and try again (in case localStorage is still loading)
+        console.log('⚠️ Case not found immediately, retrying in 200ms...');
+        setTimeout(() => {
+          const retryCase = getCaseByToken(token);
+          console.log('Retry lookup result:', retryCase);
+          
+          if (retryCase) {
+            console.log('✅ Case found on retry');
+            setCaseData(retryCase);
+            setNotFound(false);
+          } else {
+            console.log('❌ Case still not found after retry');
+            setNotFound(true);
+          }
+          setLoading(false);
+        }, 200);
+      }
     } else {
-      console.log('No token provided');
+      console.log('❌ No token provided in URL');
       setNotFound(true);
       setLoading(false);
     }
@@ -207,43 +224,117 @@ export default function DoctorRecord() {
     const allCases = getAllCases();
     return (
       <div className="min-h-screen bg-[#FCFBF8] flex items-center justify-center p-4">
-        <div className="text-center max-w-2xl w-full">
+        <div className="text-center max-w-3xl w-full">
           <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
             <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
           <h1 className="text-xl font-bold text-[#0B2342] mb-2">Record Not Found</h1>
-          <p className="text-sm text-gray-500 mb-4">
-            This QR code link is invalid or the record has been deleted.
+          <p className="text-sm text-gray-500 mb-6">
+            The record you're looking for doesn't exist or has been deleted.
           </p>
           
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left">
-            <p className="text-xs font-semibold text-yellow-800 mb-2">🔍 Debug Information:</p>
-            <p className="text-xs text-yellow-700 mb-2">Token: {token || 'none'}</p>
-            {allCases.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-yellow-200">
-                <p className="text-xs font-semibold text-yellow-800 mb-2">Available Cases ({allCases.length}):</p>
-                <div className="space-y-1 max-h-40 overflow-y-auto">
-                  {allCases.map(c => (
-                    <div key={c.id} className="text-xs text-yellow-700 flex justify-between items-center bg-yellow-100/50 px-2 py-1 rounded">
-                      <span className="font-mono">{c.publicToken}</span>
-                      <Link to={`/record/${c.publicToken}`} className="text-blue-600 hover:underline">Open →</Link>
-                    </div>
-                  ))}
-                </div>
+          {/* Debug Panel */}
+          <div className="bg-white border-2 border-yellow-300 rounded-xl p-6 mb-6 text-left shadow-lg">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">🔍</span>
+              <h2 className="text-lg font-bold text-[#0B2342]">Debug Information</h2>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-xs font-semibold text-gray-600 mb-1">Token from URL:</p>
+                <p className="text-sm font-mono text-[#0B2342] break-all">{token || '(none)'}</p>
+                <p className="text-xs text-gray-500 mt-1">Length: {token?.length || 0} characters</p>
               </div>
-            )}
-            {allCases.length === 0 && (
-              <p className="text-xs text-yellow-700 mt-2">No cases found. Create a case first!</p>
-            )}
+
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-xs font-semibold text-gray-600 mb-1">Current URL:</p>
+                <p className="text-xs font-mono text-[#0B2342] break-all">{window.location.href}</p>
+              </div>
+
+              {allCases.length > 0 ? (
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <p className="text-xs font-semibold text-blue-800 mb-2">
+                    ✅ Found {allCases.length} case{allCases.length !== 1 ? 's' : ''} in storage:
+                  </p>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {allCases.map(c => (
+                      <div key={c.id} className="bg-white rounded-lg p-3 border border-blue-200">
+                        <div className="flex justify-between items-start gap-2 mb-2">
+                          <div className="flex-1">
+                            <p className="text-xs font-semibold text-gray-600">Token:</p>
+                            <p className="text-sm font-mono text-[#0B2342] break-all">{c.publicToken}</p>
+                          </div>
+                          <Link 
+                            to={`/record/${c.publicToken}`} 
+                            className="px-3 py-1 bg-[#20B6A0] text-white rounded text-xs font-medium hover:bg-[#1a9e8a] whitespace-nowrap"
+                          >
+                            Open →
+                          </Link>
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          <span className="font-semibold">Patient:</span> {c.patientLabel || 'Anonymous'}
+                          <span className="mx-2">•</span>
+                          <span className="font-semibold">Status:</span> {c.status}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-red-50 rounded-lg p-3">
+                  <p className="text-sm text-red-800 font-semibold">❌ No cases found in storage</p>
+                  <p className="text-xs text-red-700 mt-1">
+                    This means either no cases have been created yet, or the data was cleared.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex gap-3 justify-center">
-            <Link to="/dashboard" className="px-6 py-2 bg-[#12365B] text-white rounded-lg text-sm font-medium hover:bg-[#0B2342]">
-              Go to Dashboard
-            </Link>
-            <Link to="/test-qr" className="px-6 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">
-              Test QR Codes
-            </Link>
+          {/* Quick Actions */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+            <h3 className="text-sm font-bold text-[#0B2342] mb-3">Quick Actions</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Link 
+                to="/dashboard" 
+                className="px-4 py-3 bg-[#12365B] text-white rounded-lg text-sm font-medium hover:bg-[#0B2342] flex items-center justify-center gap-2"
+              >
+                <span>📋</span> Go to Dashboard
+              </Link>
+              <Link 
+                to="/test-qr" 
+                className="px-4 py-3 bg-[#20B6A0] text-white rounded-lg text-sm font-medium hover:bg-[#1a9e8a] flex items-center justify-center gap-2"
+              >
+                <span>🧪</span> Test All QR Codes
+              </Link>
+              <Link 
+                to="/case/create" 
+                className="px-4 py-3 border-2 border-[#20B6A0] text-[#20B6A0] rounded-lg text-sm font-medium hover:bg-[#20B6A0] hover:text-white flex items-center justify-center gap-2"
+              >
+                <span>➕</span> Create New Case
+              </Link>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+              >
+                <span>🔄</span> Reload Page
+              </button>
+            </div>
+          </div>
+
+          {/* Help Section */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-left">
+            <h3 className="text-sm font-bold text-blue-900 mb-2">💡 Why This Happens</h3>
+            <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
+              <li>The case may have been deleted from the dashboard</li>
+              <li>You're on a different device/browser (demo uses localStorage)</li>
+              <li>The QR code link is outdated or incorrect</li>
+              <li>The browser storage was cleared</li>
+            </ul>
+            <p className="text-xs text-blue-700 mt-3 font-semibold">
+              ✅ Solution: Click any "Open →" button above to access an existing case, or create a new one.
+            </p>
           </div>
         </div>
       </div>

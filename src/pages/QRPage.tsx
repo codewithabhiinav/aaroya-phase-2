@@ -33,7 +33,13 @@ export default function QRPage() {
     if (!caseData) return '';
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/record/${caseData.publicToken}`;
-    console.log('Generated QR URL:', url);
+    console.log('=== QR URL Generation ===');
+    console.log('Base URL:', baseUrl);
+    console.log('Public Token:', caseData.publicToken);
+    console.log('Token length:', caseData.publicToken.length);
+    console.log('Full URL:', url);
+    console.log('URL length:', url.length);
+    console.log('========================');
     return url;
   }
 
@@ -168,28 +174,31 @@ export default function QRPage() {
         )}
 
         {/* Test Banner */}
-        <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl">
+        <div className="mb-6 p-5 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl shadow-lg">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <CheckCircle className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+              <CheckCircle className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-green-900 mb-1">✅ QR Code Ready to Test!</h3>
-              <p className="text-sm text-green-800 mb-3">
-                Click below to open the doctor record in a new tab and verify it works.
+              <h3 className="text-lg font-bold text-green-900 mb-2">✅ QR Code Ready to Test!</h3>
+              <p className="text-sm text-green-800 mb-4">
+                Click the button below to open the doctor record in a new tab and verify it works.
               </p>
               <a
                 href={recordUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors shadow-lg shadow-green-200"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg text-base font-bold hover:bg-green-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-5 h-5" />
                 Test QR Link → Opens Record
               </a>
-              <p className="text-xs text-green-700 mt-2 break-all">
-                URL: <code className="bg-green-100 px-2 py-0.5 rounded">{recordUrl}</code>
-              </p>
+              <div className="mt-4 bg-white/70 rounded-lg p-3 border border-green-200">
+                <p className="text-xs font-semibold text-green-800 mb-1">📋 Record URL (copy if needed):</p>
+                <p className="text-xs font-mono text-green-900 break-all bg-white px-2 py-1 rounded border border-green-100">
+                  {recordUrl}
+                </p>
+              </div>
             </div>
           </div>
         </div>
