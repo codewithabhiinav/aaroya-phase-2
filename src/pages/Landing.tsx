@@ -1,7 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Mic, FileText, CheckCircle, QrCode, Smartphone, ArrowRight, Shield, AlertTriangle } from 'lucide-react';
+import { createCase } from '../store';
 
 export default function Landing() {
+  const navigate = useNavigate();
+
+  function handleTryVoice() {
+    const newCase = createCase({
+      patientLabel: 'Voice Demo Patient',
+      status: 'draft',
+    });
+    navigate(`/case/${newCase.id}/scribe`);
+  }
+
   return (
     <div className="min-h-screen bg-[#FCFBF8]">
       {/* Header */}
@@ -37,6 +48,12 @@ export default function Landing() {
             Turn emergency voice notes into structured, paramedic-verified handover records accessible through a unique QR link.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={handleTryVoice}
+              className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl text-base font-semibold hover:opacity-90 transition-all shadow-lg shadow-red-200 flex items-center justify-center gap-2 animate-recording-pulse"
+            >
+              🎤 Try Voice Input <ArrowRight className="w-4 h-4" />
+            </button>
             <Link
               to="/case/create"
               className="px-6 py-3 bg-[#20B6A0] text-white rounded-xl text-base font-semibold hover:bg-[#1a9e8a] transition-all shadow-lg shadow-[#20B6A0]/20 flex items-center justify-center gap-2"
@@ -85,6 +102,38 @@ export default function Landing() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Voice Demo Highlight */}
+      <section className="bg-gradient-to-br from-[#0B2342] to-[#12365B] py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-sm font-medium mb-6">
+            <Mic className="w-4 h-4" /> Working Microphone Feature
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">🎤 Voice-First Emergency Capture</h2>
+          <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
+            Click the big microphone button, speak your emergency observations, and watch the transcript appear in real-time. 
+            Works in Chrome, Edge, and Safari. No setup required.
+          </p>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto border border-white/20">
+            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-xl animate-recording-pulse">
+              <Mic className="w-10 h-10 text-white" />
+            </div>
+            <p className="text-white font-semibold mb-2">Tap to Start Recording</p>
+            <div className="flex items-center justify-center gap-1 h-6 mb-3">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="w-1 bg-[#20B6A0] rounded-full" style={{ height: `${8 + Math.random() * 16}px` }}></div>
+              ))}
+            </div>
+            <p className="text-xs text-gray-400">Live audio level meter • Real-time transcript</p>
+          </div>
+          <button
+            onClick={handleTryVoice}
+            className="mt-8 px-8 py-4 bg-red-500 text-white rounded-xl text-base font-bold hover:bg-red-600 transition-all shadow-xl shadow-red-500/30 inline-flex items-center gap-2"
+          >
+            🎤 Try It Now — Click to Start Voice Demo
+          </button>
         </div>
       </section>
 

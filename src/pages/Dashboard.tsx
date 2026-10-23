@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, Clock, CheckCircle, QrCode, Search, Plus, Trash2, Eye, Edit, AlertTriangle } from 'lucide-react';
+import { FileText, Clock, CheckCircle, QrCode, Search, Plus, Trash2, Eye, Edit, AlertTriangle, Mic } from 'lucide-react';
 import Layout from '../components/Layout';
-import { getAllCases, getCaseStats, deleteCase, seedDemoCases } from '../store';
+import { getAllCases, getCaseStats, deleteCase, seedDemoCases, createCase } from '../store';
 import { EmergencyCase, CaseStatus } from '../types';
 
 export default function Dashboard() {
@@ -31,6 +31,18 @@ export default function Dashboard() {
   function handleLoadDemo() {
     seedDemoCases();
     refreshData();
+  }
+
+  function handleTryVoiceDemo() {
+    const newCase = createCase({
+      patientLabel: 'Voice Demo: Anonymous Patient',
+      age: '',
+      sex: '',
+      emergencyCategory: '',
+      chiefComplaint: '',
+      status: 'draft',
+    });
+    navigate(`/case/${newCase.id}/scribe`);
   }
 
   const filtered = cases.filter(c => {
@@ -83,7 +95,10 @@ export default function Dashboard() {
               {' '}Local storage active • {stats.total} case(s)
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <button onClick={handleTryVoiceDemo} className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2 shadow-lg shadow-red-200">
+              <Mic className="w-4 h-4" /> 🎤 Try Voice Demo
+            </button>
             <button onClick={handleLoadDemo} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
               Load Demo Cases
             </button>
