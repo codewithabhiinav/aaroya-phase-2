@@ -19,7 +19,11 @@ export function getCaseById(id: string): EmergencyCase | null {
 
 export function getCaseByToken(token: string): EmergencyCase | null {
   const cases = getAllCases();
-  return cases.find(c => c.publicToken === token) || null;
+  console.log('Searching for token:', token);
+  console.log('Available tokens:', cases.map(c => c.publicToken));
+  const found = cases.find(c => c.publicToken === token) || null;
+  console.log('Found case:', found);
+  return found;
 }
 
 export function createCase(partial: Partial<EmergencyCase>): EmergencyCase {
@@ -60,6 +64,7 @@ export function createCase(partial: Partial<EmergencyCase>): EmergencyCase {
   const cases = getAllCases();
   cases.push(newCase);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+  console.log('Created case:', newCase);
   return newCase;
 }
 
@@ -281,7 +286,6 @@ export function getCaseStats() {
 }
 
 export function getBaseUrl(): string {
-  const envUrl = (window as any).__AAROGYA_BASE_URL__;
-  if (envUrl) return envUrl;
+  // Use the current origin (protocol + hostname + port)
   return window.location.origin;
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Download, Copy, Printer, ExternalLink, CheckCircle, QrCode } from 'lucide-react';
+import { Download, Copy, Printer, ExternalLink, CheckCircle, QrCode, ArrowLeft } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import Layout from '../components/Layout';
 import { getCaseById, getBaseUrl } from '../store';
@@ -31,7 +31,10 @@ export default function QRPage() {
 
   function getRecordUrl(): string {
     if (!caseData) return '';
-    return `${getBaseUrl()}/record/${caseData.publicToken}`;
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/record/${caseData.publicToken}`;
+    console.log('Generated QR URL:', url);
+    return url;
   }
 
   function handleCopyLink() {
@@ -41,7 +44,6 @@ export default function QRPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => {
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = url;
       document.body.appendChild(textArea);
@@ -69,6 +71,7 @@ export default function QRPage() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      setError('');
     } catch (err: any) {
       setError(`Download failed: ${err.message}`);
     }
@@ -86,7 +89,7 @@ export default function QRPage() {
     const dataUrl = canvas.toDataURL('image/png');
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-      setError('Pop-up blocked. Please allow pop-ups for this site to print.');
+      setError('Pop-up blocked. Please allow pop-ups for this site.');
       return;
     }
     
@@ -104,10 +107,7 @@ export default function QRPage() {
           .case-info { margin-top: 20px; font-size: 14px; color: #333; }
           .case-id { font-family: monospace; font-weight: bold; }
           .footer { font-size: 10px; color: #999; margin-top: 24px; line-height: 1.6; }
-          @media print { 
-            body { padding: 20px; }
-            .no-print { display: none; }
-          }
+          @media print { body { padding: 20px; } }
         </style>
       </head>
       <body>
@@ -125,15 +125,12 @@ export default function QRPage() {
           Generated: ${new Date().toLocaleString()}<br>
           Team HealthNova | KRMU SOMC
         </p>
-        <script>
-          window.onload = function() {
-            setTimeout(function() { window.print(); }, 250);
-          };
-        </script>
+        <script>window.onload = function() { setTimeout(function() { window.print(); }, 250); };</script>
       </body>
       </html>
     `);
     printWindow.document.close();
+    setError('');
   }
 
   if (!caseData) {
@@ -152,14 +149,16 @@ export default function QRPage() {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-6">
+          <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#12365B] mb-4">
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          </Link>
           <div className="flex items-center gap-2 mb-2">
             <span className="font-mono text-xs text-gray-400">{caseData.publicToken.substring(0, 8).toUpperCase()}</span>
             <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">Verified</span>
           </div>
           <h1 className="text-2xl font-bold text-[#0B2342]">QR Code Generated</h1>
-          <p className="text-sm text-gray-500 mt-1">Share this QR code with the receiving doctor or print for the patient.</p>
+          <p className="text-sm text-gray-500 mt-1">Share this QR code or test the link below.</p>
         </div>
 
         {error && (
@@ -168,7 +167,7 @@ export default function QRPage() {
           </div>
         )}
 
-        {/* Quick Test Banner */}
+        {/* Test Banner */}
         <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -177,7 +176,7 @@ export default function QRPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-green-900 mb-1">✅ QR Code Ready to Test!</h3>
               <p className="text-sm text-green-800 mb-3">
-                Click the button below to open the doctor record in a new tab and verify it works.
+                Click below to open the doctor record in a new tab and verify it works.
               </p>
               <a
                 href={recordUrl}
@@ -188,8 +187,8 @@ export default function QRPage() {
                 <ExternalLink className="w-4 h-4" />
                 Test QR Link → Opens Record
               </a>
-              <p className="text-xs text-green-700 mt-2">
-                URL: <code className="bg-green-100 px-2 py-0.5 rounded text-xs">{recordUrl}</code>
+              <p className="text-xs text-green-700 mt-2 break-all">
+                URL: <code className="bg-green-100 px-2 py-0.5 rounded">{recordUrl}</code>
               </p>
             </div>
           </div>
@@ -213,7 +212,6 @@ export default function QRPage() {
               <p className="text-xs text-gray-400 mt-1">Case: {caseData.publicToken.substring(0, 8).toUpperCase()}</p>
             </div>
 
-            {/* Actions */}
             <div className="grid grid-cols-2 gap-3 mt-6">
               <button 
                 onClick={handleDownloadQR} 
@@ -234,13 +232,14 @@ export default function QRPage() {
               >
                 <Printer className="w-4 h-4" /> Print QR
               </button>
-              <Link 
-                to={`/record/${caseData.publicToken}`} 
-                target="_blank" 
+              <a 
+                href={recordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-4 py-2.5 bg-[#20B6A0] text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#1a9e8a] transition-colors"
               >
-                <ExternalLink className="w-4 h-4" /> Open Doctor View
-              </Link>
+                <ExternalLink className="w-4 h-4" /> Open Record
+              </a>
             </div>
           </div>
 
@@ -265,10 +264,6 @@ export default function QRPage() {
                   <span className="text-gray-500">Created</span>
                   <span className="text-[#0B2342]">{new Date(caseData.createdAt).toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-50">
-                  <span className="text-gray-500">Verified</span>
-                  <span className="text-[#0B2342]">{caseData.verifiedAt ? new Date(caseData.verifiedAt).toLocaleString() : 'N/A'}</span>
-                </div>
                 <div className="py-2">
                   <span className="text-gray-500 text-xs block mb-1">QR Link:</span>
                   <p className="text-[#20B6A0] text-xs font-mono break-all bg-gray-50 p-2 rounded">{recordUrl}</p>
@@ -276,41 +271,21 @@ export default function QRPage() {
               </div>
             </div>
 
-            {/* Test Link */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-green-800 mb-2">🧪 Test This QR Link</h3>
-              <p className="text-xs text-green-700 mb-3">
-                Click below to open the doctor record in a new tab (same browser). 
-                This proves the QR link works correctly.
-              </p>
-              <a
-                href={recordUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium text-center hover:bg-green-700 transition-colors"
-              >
-                🔗 Open Record in New Tab
-              </a>
-            </div>
-
             <div className="bg-[#12365B] rounded-xl p-6 text-white">
               <h3 className="font-semibold mb-2">📱 How QR Works</h3>
               <div className="text-sm text-gray-300 space-y-2">
-                <p><strong>Same device:</strong> Click "Open Record in New Tab" above to test.</p>
-                <p><strong>Different device:</strong> Scan QR with phone camera. Note: demo data is stored in browser localStorage, so it only works on THIS device/browser.</p>
+                <p><strong>Same device:</strong> Click "Test QR Link" above to verify.</p>
+                <p><strong>Different device:</strong> Demo data is in localStorage, so QR only works on THIS device/browser.</p>
                 <p><strong>Production:</strong> With Supabase backend, QR would work on any device.</p>
               </div>
-              <p className="text-xs text-gray-400 mt-3">
-                Current URL: {getBaseUrl()}
-              </p>
             </div>
 
             <div className="flex gap-3">
               <Link to="/dashboard" className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium text-center hover:bg-gray-50 transition-colors">
-                Back to Dashboard
+                Dashboard
               </Link>
-              <Link to="/history" className="flex-1 px-4 py-2.5 bg-[#12365B] text-white rounded-lg text-sm font-medium text-center hover:bg-[#0B2342] transition-colors">
-                View Case History
+              <Link to="/test-qr" className="flex-1 px-4 py-2.5 bg-[#12365B] text-white rounded-lg text-sm font-medium text-center hover:bg-[#0B2342] transition-colors">
+                Test All QR Codes
               </Link>
             </div>
           </div>
