@@ -4,6 +4,7 @@ import { FileText, Clock, CheckCircle, QrCode, Search, Plus, Trash2, Eye, Edit, 
 import Layout from '../components/Layout';
 import { getAllCases, getCaseStats, deleteCase, seedDemoCases, createCase } from '../store';
 import { EmergencyCase, CaseStatus } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Dashboard() {
   const [cases, setCases] = useState<EmergencyCase[]>([]);
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState<CaseStatus>('all');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     refreshData();
@@ -81,36 +83,36 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-[#0B2342]">Paramedic Dashboard</h1>
+            <h1 className="text-2xl font-bold text-[#0B2342]">{t('paramedicDashboard')}</h1>
             <p className="text-sm text-gray-500 mt-1">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#20B6A0]/10 text-[#20B6A0] rounded text-xs font-medium">
-                Demo Mode
+                {t('demoMode')}
               </span>
-              {' '}• {stats.total} case(s)
+              {' '}• {stats.total} {t('totalCases').toLowerCase()}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button onClick={handleTryVoiceDemo} className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2 shadow-lg shadow-red-200">
-              <Mic className="w-4 h-4" /> 🎤 Try Voice
+              <Mic className="w-4 h-4" /> {t('tryVoice')}
             </button>
             <Link to="/test-qr" className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2 shadow-lg shadow-blue-200">
-              <QrCode className="w-4 h-4" /> 🧪 Test QR
+              <QrCode className="w-4 h-4" /> {t('testQR')}
             </Link>
             <button onClick={handleLoadDemo} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
-              Load Demo
+              {t('loadDemo')}
             </button>
             <Link to="/case/create" className="px-4 py-2 bg-[#20B6A0] text-white rounded-lg text-sm font-medium hover:bg-[#1a9e8a] flex items-center gap-2">
-              <Plus className="w-4 h-4" /> New Case
+              <Plus className="w-4 h-4" /> {t('newCase')}
             </Link>
           </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Total Cases', value: stats.total, icon: FileText, color: 'bg-[#12365B]' },
-            { label: 'Drafts', value: stats.draft, icon: Clock, color: 'bg-yellow-500' },
-            { label: 'Pending', value: stats.awaitingVerification, icon: Clock, color: 'bg-blue-500' },
-            { label: 'Verified', value: stats.verified, icon: CheckCircle, color: 'bg-green-500' },
+            { label: t('totalCases'), value: stats.total, icon: FileText, color: 'bg-[#12365B]' },
+            { label: t('drafts'), value: stats.draft, icon: Clock, color: 'bg-yellow-500' },
+            { label: t('pending'), value: stats.awaitingVerification, icon: Clock, color: 'bg-blue-500' },
+            { label: t('verified'), value: stats.verified, icon: CheckCircle, color: 'bg-green-500' },
           ].map((stat, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5">
               <div className="flex items-center gap-3">

@@ -2,6 +2,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { ReactNode } from 'react';
 import { Heart, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useLanguage } from '../context/LanguageContext';
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,12 +13,13 @@ interface LayoutProps {
 export default function Layout({ children, showNav = true }: LayoutProps) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   const navLinks = [
-    { path: '/dashboard', label: 'Dashboard' },
-    { path: '/history', label: 'Case History' },
-    { path: '/roadmap', label: 'Roadmap' },
-    { path: '/settings', label: 'Settings' },
+    { path: '/dashboard', label: t('dashboard') },
+    { path: '/history', label: t('caseHistory') },
+    { path: '/roadmap', label: t('roadmap') },
+    { path: '/settings', label: t('settings') },
   ];
 
   return (
@@ -47,11 +50,12 @@ export default function Layout({ children, showNav = true }: LayoutProps) {
                     {link.label}
                   </Link>
                 ))}
+                <LanguageSwitcher />
                 <Link
                   to="/case/create"
                   className="ml-2 px-4 py-2 bg-[#20B6A0] text-white rounded-lg text-sm font-medium hover:bg-[#1a9e8a] transition-colors"
                 >
-                  + New Case
+                  {t('newCase')}
                 </Link>
               </div>
 
@@ -82,12 +86,15 @@ export default function Layout({ children, showNav = true }: LayoutProps) {
                   {link.label}
                 </Link>
               ))}
+              <div className="py-2 border-t border-gray-100">
+                <LanguageSwitcher />
+              </div>
               <Link
                 to="/case/create"
                 onClick={() => setMenuOpen(false)}
                 className="block px-3 py-2 bg-[#20B6A0] text-white rounded-lg text-sm font-medium text-center"
               >
-                + New Case
+                {t('newCase')}
               </Link>
             </div>
           )}
