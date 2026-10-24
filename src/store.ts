@@ -129,6 +129,20 @@ export function invalidateVerification(id: string): EmergencyCase | null {
 }
 
 export function generateAIDraft(transcript: string): AIDraft {
+  if (!transcript || transcript.trim().length === 0) {
+    return {
+      chiefComplaint: 'Not specified',
+      symptoms: 'Not specified',
+      vitals: 'Not reported',
+      medicalHistory: 'Not reported',
+      allergies: 'Not specified',
+      medications: 'Not reported',
+      interventions: 'Not reported',
+      missingInfo: ['No transcript provided'],
+      summary: 'No information available.',
+    };
+  }
+
   const lower = transcript.toLowerCase();
   const missingInfo: string[] = [];
 
