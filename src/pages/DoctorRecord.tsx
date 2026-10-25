@@ -428,7 +428,8 @@ export default function DoctorRecord() {
         </section>
 
         <footer className="text-center py-4 border-t border-gray-100 print:hidden">
-          <p className="text-xs text-gray-400">Team HealthNova | KRMU SOMC | Hackathon Prototype</p>
+          <p className="text-xs text-gray-400">Developed by Abhinav · code_with_abhinav</p>
+          <p className="text-xs text-gray-400 mt-1">All rights reserved by Team HealthNova. | KRMU SOMC | Hackathon Prototype</p>
         </footer>
       </div>
     </div>

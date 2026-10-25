@@ -153,6 +153,10 @@ export default function Landing() {
             {t('krmu')} — {t('somc')}
           </p>
           <p className="text-xs text-gray-400 mt-2">{t('hackathonPrototype')} • {t('demoMode')}</p>
+          <p className="text-sm text-gray-600 mt-4">
+            Developed by Abhinav · <span className="font-medium text-[#12365B]">code_with_abhinav</span>
+          </p>
+          <p className="text-xs text-gray-400 mt-1">All rights reserved by Team HealthNova.</p>
         </div>
       </footer>
     </div>
